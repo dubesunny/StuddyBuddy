@@ -21,15 +21,36 @@ class UserRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => 'required',
-            'email' => 'required|unique:users,email',
-            'phone' => 'required|digits:10|unique:users,phone',
-            'role' => 'required',
+        $rules = [
+            'name'   => 'required|string|max:255',
+
+            'role'   => 'required',
+
             'gender' => 'required',
+
             'status' => 'required',
-            'password' => 'required',
-            'image' => 'nullable'
+
+            'image'  => 'nullable|image|mimes:jpg,png|max:2048',
         ];
+
+        if ($this->isMethod('post')) {
+            $rules['password'] = [
+                'required',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/',
+            ];
+            $rules['email'] = 'required|email|unique:users,email';
+            $rules['phone']  = 'required|regex:/^[6-9]\d{9}$/|unique:users,phone';
+        }
+
+        if ($this->isMethod('put')) {
+            $rules['password'] = [
+                'nullable',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/',
+            ];
+            $rules['email'] =  'required|email|unique:users,email,' .$this->user->id;
+            $rules['phone'] = 'required|regex:/^[6-9]\d{9}$/|unique:users,phone,' .$this->user->id;
+        }
+
+        return $rules;
     }
 }

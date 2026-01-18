@@ -5,9 +5,8 @@
 <script src="{{ asset('admin/dist/plugins/data-table/dataTables.bootstrap5.min.js') }}"></script>
 <script src="{{ asset('admin/dist/plugins/data-table/dataTables.responsive.min.js') }}"></script>
 <script src="{{ asset('admin/dist/plugins/dropify/dist/js/dropify.min.js') }}"></script>
-
-<!-- JavaScript -->
-<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/alertify.min.js"></script>
+<script src="{{asset('admin/dist/plugins/toastr/toastr.min.js')}}"></script>
+<script src="{{asset('admin/dist/plugins/parsley/parsley.min.js')}}"></script>
 <!-- endinject -->
 <!-- Plugin js for this page -->
 <script src="{{ asset('admin/dist/assets/vendors/chart.js/chart.umd.js') }}"></script>
@@ -22,6 +21,19 @@
 <!-- endinject -->
 <!-- Custom js for this page -->
 <script src="{{ asset('admin/dist/assets/js/dashboard.js') }}"></script>
+<script src="{{ asset('admin/dist/plugins/sweetalert2/sweetalert2.min.js')}}"></script>
 <script src="{{ asset('admin/custom.js')}}"></script>
 <!-- End custom js for this page -->
+@if (session()->has('success'))
+    <script>
+        toastr.success("{{ session()->get('success') }}")
+    </script>
+@endif
+
+
+@if (session()->has('error'))
+    <script>
+        toastr.error("{{ session()->get('error') }}")
+    </script>
+@endif
 @stack('script')

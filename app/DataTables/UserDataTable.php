@@ -22,7 +22,14 @@ class UserDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('action', 'user.action')
+            ->addColumn('action', function ($row) {
+                return $row->action;
+            })
+            ->addColumn('role', function ($row) {
+                $rolename = $row->roles->first()->name;
+                return ucwords($rolename);
+            })
+            ->rawColumns(['action', 'status'])
             ->setRowId('id');
     }
 
@@ -33,7 +40,19 @@ class UserDataTable extends DataTable
      */
     public function query(User $model): QueryBuilder
     {
-        return $model->newQuery();
+        $model = $model->with('roles')->newQuery();
+
+        $status = request()->status;
+        if (!empty($status)) {
+            $model->whereStatus($status);
+        }
+
+        if (!empty(request()->role)) {
+            $model->whereHas('roles', function ($q) {
+                $q->where('id', request()->role);
+            });
+        }
+        return $model;
     }
 
     /**
@@ -65,15 +84,13 @@ class UserDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::computed('action')
-                ->exportable(false)
-                ->printable(false)
-                ->width(60)
-                ->addClass('text-center'),
             Column::make('id'),
             Column::make('name'),
-            Column::make('created_at'),
-            Column::make('updated_at'),
+            Column::make('email'),
+            Column::make('phone'),
+            Column::make('role'),
+            Column::make('status'),
+            Column::make('action')
         ];
     }
 
