@@ -17,7 +17,7 @@
         
           
           
-          {{-- <x-sidebar.item :route="route('dashboard')" icon="home" name="Dashboard" /> --}}
+          <x-sidebar.item :route="route('dashboard')" icon="home" name="Dashboard" />
           <x-sidebar.item :route="route('users.index')" icon="account-group" name="Users" />
       </ul>
   </nav>

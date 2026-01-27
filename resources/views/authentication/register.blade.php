@@ -75,13 +75,17 @@
                                     {{-- Gender --}}
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <select name="gender" class="form-select form-select-lg" required data-parsley-required-message="Please select gender">
+                                            <select name="gender" class="form-select form-select-lg" required
+                                                data-parsley-required-message="Please select gender">
                                                 <option value="">Select Gender</option>
-                                                <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male
+                                                <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>
+                                                    Male
                                                 </option>
-                                                <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>
+                                                <option value="female"
+                                                    {{ old('gender') == 'female' ? 'selected' : '' }}>
                                                     Female</option>
-                                                <option value="others" {{ old('gender') == 'others' ? 'selected' : '' }}>
+                                                <option value="others"
+                                                    {{ old('gender') == 'others' ? 'selected' : '' }}>
                                                     Others</option>
                                             </select>
 
@@ -95,7 +99,8 @@
 
                                 {{-- Role --}}
                                 <div class="form-group">
-                                    <select name="role" class="form-select form-select-lg" required data-parsley-required-message="Please select role">
+                                    <select name="role" class="form-select form-select-lg" required
+                                        data-parsley-required-message="Please select role">
                                         <option value="">Select Role</option>
                                         @foreach ($roles as $role)
                                             <option value="{{ $role->id }}"
@@ -161,6 +166,10 @@
                                         SIGN UP
                                     </button>
                                 </div>
+                                <div class="text-center mt-4 font-weight-light"> Already have an account? <a
+                                        href="{{ route('login')}}" class="text-primary">Login</a>
+                                </div>
+
                             </form>
 
 

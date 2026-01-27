@@ -1,6 +1,5 @@
 @stack('up-script')
 <script src="{{ asset('admin/dist/assets/vendors/js/vendor.bundle.base.js') }}"></script>
-<script src="{{ asset('admin/dist/plugins/bootstrap/bootstrap.bundle.min.js') }}"></script>
 <script src="{{ asset('admin/dist/plugins/data-table/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('admin/dist/plugins/data-table/dataTables.bootstrap5.min.js') }}"></script>
 <script src="{{ asset('admin/dist/plugins/data-table/dataTables.responsive.min.js') }}"></script>
