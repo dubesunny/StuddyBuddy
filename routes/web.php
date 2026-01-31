@@ -12,9 +12,12 @@ Route::group([
 ], function () {
     Route::get('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/register-attempt', [AuthController::class, 'registerAttempt'])->name('registerAttempt');
-    Route::get('/login',[AuthController::class,'login'])->name('login');
-    Route::post('/attempt',[AuthController::class,'attempt'])->name('attempt-login');
-    Route::get('/forgot-password',[AuthController::class,'forgotPassword'])->name('forgotpassword');
+    Route::get('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/attempt', [AuthController::class, 'attempt'])->name('attempt-login');
+    Route::get('/forgot-password', [AuthController::class, 'forgotPassword'])->name('forgotpassword');
+    Route::post('/send-password-reset-link', [AuthController::class, 'sendPasswordResetLink'])->name('sendPasswordResetLink');
+    Route::get('/reset-password/{token}', [AuthController::class, 'passwordReset'])->name('password.reset');
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('resetPassword');
 });
 
 Route::controller(VerifyController::class)->group(function () {
@@ -23,7 +26,7 @@ Route::controller(VerifyController::class)->group(function () {
     Route::post('/email/resend/', 'resend')->middleware(['auth', 'throttle:6,1'])->name('verification.resend');
 });
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::post('/logout',[AuthController::class,'logout'])->name('logout');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/', function () {
         return view('index');
     })->name('dashboard');
@@ -32,6 +35,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::resource('users', UserController::class);
     });
-
 });
-

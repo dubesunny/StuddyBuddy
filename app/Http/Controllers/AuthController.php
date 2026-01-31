@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Exception;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
 class AuthController extends Controller
@@ -61,6 +65,39 @@ class AuthController extends Controller
     public function forgotPassword(){
         return view('authentication.forgetpassword');
     }
+
+    public function sendPasswordResetLink(ForgotPasswordRequest $request){
+        $status = Password::sendResetLink($request->only('email'));
+
+        return $status === Password::RESET_LINK_SENT ? back()->with('success',__($status)) : back()->withErrors(['email' => __($status)]);
+    }
+
+    public function passwordReset(string $token){
+        return view('authentication.passwordReset',compact('token'));
+    }
+
+    public function resetPassword(Request $request){
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' =>  'required|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/|confirmed',
+        ]);
+
+        $status = Password::reset($request->only(['email','password','password_confirmation','token']),
+                function(User $user,string $password){
+                    $user->forceFill([
+                        'password' => $password
+                    ])->setRememberToken(Str::random(60));
+                    $user->save();
+                    event(new PasswordReset($user));
+                }
+        );
+        return $status === Password::PASSWORD_RESET
+            ? redirect()->route('login')->with('status', __($status))
+            : back()->withErrors(['email' => [__($status)]]);
+
+    }
+
     public function logout(){
         Session::flush();
         Auth::logout();

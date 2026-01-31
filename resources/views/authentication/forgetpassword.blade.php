@@ -19,8 +19,8 @@
                             <div class="brand-logo">
                                 <img src="{{ asset('admin/dist/assets/images/logo.svg') }}">
                             </div>
-                            <h4>Send Password ResetLink.</h6>
-                            <form class="pt-3" id="forgetPassword">
+                            <h4>Send Password ResetLink.</h4>
+                            <form action="{{ route('sendPasswordResetLink')}}" class="pt-3" method="POST" id="forgetPassword">
                                 @csrf
                                 <div class="form-group">
                                     <input type="email" class="form-control form-control-lg" name="email"
