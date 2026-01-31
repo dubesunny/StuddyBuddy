@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Exception;
@@ -43,9 +44,26 @@ class AuthController extends Controller
     public function login(){
         return view('authentication.login');
     }
+
+    public function attempt(LoginRequest $request){
+        if(Auth::attempt($request->only('email','password'),$request->remember)){
+            if(Auth::user()->getRawOriginal('status') === 'active'){
+                return redirect()->route('dashboard')->with('success','Welcome Back!');
+            }else {
+                Auth::logout();
+                Session::flush();
+                return redirect('login')->with('error','Contact admin your account has been suspended');
+            }
+        }
+        return redirect()->back()->with('error','Invalid username or password');
+    }
+
+    public function forgotPassword(){
+        return view('authentication.forgetpassword');
+    }
     public function logout(){
         Session::flush();
         Auth::logout();
-        return redirect()->route('register')->with('success','You have logged out successfully');
+        return redirect()->route('login')->with('success','You have logged out successfully');
     }
 }

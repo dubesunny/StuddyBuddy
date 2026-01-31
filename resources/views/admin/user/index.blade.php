@@ -12,13 +12,15 @@
         <!-- Right: Filter -->
         <div class="col-md-8">
             <div class="d-flex justify-content-end align-items-center gap-2">
-                <select name="role" id="filter-role" class="form-select select-lg select2 datatable-filter" style="width: 220px;">
+                <select name="role" id="filter-role" class="form-select select-lg select2 datatable-filter"
+                    style="width: 220px;">
                     <option value="">Select Role</option>
                     @foreach ($roles as $role)
                         <option value="{{ $role->id }}">{{ ucwords($role->name) }}</option>
                     @endforeach
                 </select>
-                <select name="status" id="filter-status" class="form-select select-lg select2 datatable-filter" style="width: 220px;">
+                <select name="status" id="filter-status" class="form-select select-lg select2 datatable-filter"
+                    style="width: 220px;">
                     <option value="">Select Status</option>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
@@ -83,7 +85,11 @@
                     contentType: false,
                     processData: false,
                     success: function(response) {
-                        toastr.success(response.message);
+                         showToast({
+                                type: 'success',
+                                title: 'Success',
+                                message: response.message
+                            });
                         closeCanvas();
                         refreshTable();
                     },
@@ -97,7 +103,11 @@
                         }
 
                         if (response.status === 500) {
-                            toastr.error(response.error);
+                            showToast({
+                                type: 'error',
+                                title: 'Error',
+                                message: response.error
+                            });
                         }
                     }
                 });
@@ -139,11 +149,19 @@
                         type: 'DELETE',
                         url: url,
                         success: function(response) {
-                            toastr.success(response.message);
+                            showToast({
+                                type: 'success',
+                                title: 'Success',
+                                message: response.message
+                            });
                             refreshTable();
                         },
                         error: function(xhr) {
-                            toastr.error(xhr.responseJSON?.message ?? 'Something went wrong');
+                            showToast({
+                                type: 'error',
+                                title: 'Error',
+                                message: xhr.responseJSON?.message ?? 'Something went wrong'
+                            });
                         }
                     });
                 });

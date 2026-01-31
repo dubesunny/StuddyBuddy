@@ -33,15 +33,41 @@ $(document).on('hidden.bs.offcanvas', function () {
         .removeClass('offcanvas-backdrop show')
         .css('overflow', '');
 });
-toastr.options = {
-    closeButton: true,
-    progressBar: true,
-    positionClass: "toast-top-right",
-    timeOut: 3000,
-    extendedTimeOut: 1000,
-    showDuration: 300,
-    hideDuration: 300
-};
+/**
+ * Toastr Helper (Default Toastr Features Only)
+ * @param {Object} options
+ */
+function showToast(options = {}) {
+    const {
+        type = 'success',   
+        title = '',
+        message = '',
+        timeOut = 3000,
+        position = 'toast-top-right',
+        closeButton = true,
+        progressBar = true
+    } = options;
+
+    if (!toastr[type]) {
+        console.warn('Invalid toastr type:', type);
+        return;
+    }
+
+    toastr.options = {
+        closeButton: closeButton,
+        progressBar: progressBar,
+        positionClass: position,
+        timeOut: timeOut,
+        extendedTimeOut: 1000,
+        showDuration: 300,
+        hideDuration: 300,
+        newestOnTop: true,
+        preventDuplicates: true
+    };
+
+    toastr[type](message, title);
+}
+
 window.Parsley.on('field:init', function () {
     const fieldName = this.$element.attr('name');
 
@@ -87,7 +113,7 @@ $(document).ready(function () {
     });
 });
 
-$(document).on('click','#clear',function(){
+$(document).on('click', '#clear', function () {
     const table = $("#data-table");
     table.on("preXhr.dt", function (e, settings, data) {
         $(".datatable-filter").each(function (index, item) {

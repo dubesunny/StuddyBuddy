@@ -13,6 +13,8 @@ Route::group([
     Route::get('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/register-attempt', [AuthController::class, 'registerAttempt'])->name('registerAttempt');
     Route::get('/login',[AuthController::class,'login'])->name('login');
+    Route::post('/attempt',[AuthController::class,'attempt'])->name('attempt-login');
+    Route::get('/forgot-password',[AuthController::class,'forgotPassword'])->name('forgotpassword');
 });
 
 Route::controller(VerifyController::class)->group(function () {
