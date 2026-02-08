@@ -40,5 +40,17 @@ class UserSeeder extends Seeder
                 $user->assignRole('student');
             }
         }
+
+          $admin = User::create([
+                'name' => $faker->name,
+                'email' => 'admin@example.com',
+                'phone' => $faker->numerify('##########'),
+                'gender' => $faker->randomElement($genders),
+                'status' => 'active',
+                'password' => Hash::make('123456'),
+                'email_verified_at' => now()
+            ]);
+
+        $admin->assignRole('admin');
     }
 }

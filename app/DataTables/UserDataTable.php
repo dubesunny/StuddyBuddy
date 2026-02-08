@@ -4,6 +4,7 @@ namespace App\DataTables;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
@@ -40,7 +41,7 @@ class UserDataTable extends DataTable
      */
     public function query(User $model): QueryBuilder
     {
-        $model = $model->with('roles')->newQuery();
+        $model = $model->with(['roles'])->newQuery();
 
         $status = request()->status;
         if (!empty($status)) {
@@ -90,7 +91,7 @@ class UserDataTable extends DataTable
             Column::make('phone'),
             Column::make('role'),
             Column::make('status'),
-            Column::make('action')
+            Column::make('action')->orderable('false')->visible(Auth::user()->canany(['edit_user','delete_user']) ? true : false)
         ];
     }
 

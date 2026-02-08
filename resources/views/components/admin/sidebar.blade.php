@@ -14,10 +14,15 @@
                   <i class="mdi mdi-bookmark-check text-success nav-profile-badge"></i>
               </a>
           </li>
-        
-          
-          
+
+
+
           <x-sidebar.item :route="route('dashboard')" icon="home" name="Dashboard" />
-          <x-sidebar.item :route="route('users.index')" icon="account-group" name="Users" />
+          @can('view_user')
+              <x-sidebar.item :route="route('users.index')" icon="account-group" name="Users" />
+          @endcan
+          @can('view_course')
+              <x-sidebar.item :route="route('courses.index')" icon="book-open-variant" name="Courses" />
+          @endcan
       </ul>
   </nav>

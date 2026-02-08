@@ -3,10 +3,12 @@
     <div class="row align-items-center mb-3">
         <!-- Left: Add User -->
         <div class="col-md-4">
-            <button class="btn btn-primary openCanvas" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight"
-                aria-controls="offcanvasRight">
-                ADD USER
-            </button>
+            @can('view_user')
+                <button class="btn btn-primary openCanvas" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight"
+                    aria-controls="offcanvasRight">
+                    Add USER
+                </button>
+            @endcan
         </div>
 
         <!-- Right: Filter -->
@@ -85,11 +87,11 @@
                     contentType: false,
                     processData: false,
                     success: function(response) {
-                         showToast({
-                                type: 'success',
-                                title: 'Success',
-                                message: response.message
-                            });
+                        showToast({
+                            type: 'success',
+                            title: 'Success',
+                            message: response.message
+                        });
                         closeCanvas();
                         refreshTable();
                     },

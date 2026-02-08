@@ -7,6 +7,7 @@ use App\Http\Requests\UserRequest;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
@@ -18,6 +19,7 @@ class UserController extends BaseController
      */
     public function index(UserDataTable $dataTable)
     {
+        abort_if(!Auth::user()->can('view_user'),403);
         $this->breadcrumbs([
             'User' => route('users.index')
         ]);
@@ -30,6 +32,7 @@ class UserController extends BaseController
      */
     public function create()
     {
+        abort_if(!Auth::user()->can('add_user'),403);
         $roles = Role::all();
         return view('admin.user.create', compact('roles'));
     }
@@ -39,6 +42,7 @@ class UserController extends BaseController
      */
     public function store(UserRequest $request)
     {
+        abort_if(!Auth::user()->can('add_user'),403);
         DB::beginTransaction();
         try {
             $data = $request->validated();
@@ -72,6 +76,7 @@ class UserController extends BaseController
      */
     public function edit(User $user)
     {
+        abort_if(!Auth::user()->can('edit_user'),403);
         $roles = Role::all();
         $user = $user->load('roles');
         return view('admin.user.edit', compact('roles', 'user'));
@@ -82,6 +87,7 @@ class UserController extends BaseController
      */
     public function update(UserRequest $request, User $user)
     {
+        abort_if(!Auth::user()->can('edit_user'),403);
         DB::beginTransaction();
         try {
             $data = $request->validated();
@@ -111,6 +117,7 @@ class UserController extends BaseController
      */
     public function destroy(User $user)
     {
+        abort_if(!Auth::user()->can('delete_user'),403);
         DB::beginTransaction();
         try {
             if ($user->getRawOriginal('image')) {
