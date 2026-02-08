@@ -37,8 +37,15 @@
                          <a class="dropdown-item" href="#">
                              <i class="mdi mdi-cached me-2 text-success"></i> Activity Log </a>
                          <div class="dropdown-divider"></div>
-                         <a class="dropdown-item" href="#">
-                             <i class="mdi mdi-logout me-2 text-primary"></i> Signout </a>
+                         <a class="dropdown-item" href="#"
+                             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                             <i class="mdi mdi-logout me-2 text-primary"></i> Signout
+                         </a>
+
+                         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                             @csrf
+                         </form>
+
                      </div>
                  </li>
                  <li class="nav-item d-none d-lg-block full-screen-link">
@@ -58,7 +65,8 @@
                          <div class="dropdown-divider"></div>
                          <a class="dropdown-item preview-item">
                              <div class="preview-thumbnail">
-                                 <img src="{{ asset('admin/dist/assets/images/faces/face4.jpg') }}" alt="image" class="profile-pic">
+                                 <img src="{{ asset('admin/dist/assets/images/faces/face4.jpg') }}" alt="image"
+                                     class="profile-pic">
                              </div>
                              <div
                                  class="preview-item-content d-flex align-items-start flex-column justify-content-center">

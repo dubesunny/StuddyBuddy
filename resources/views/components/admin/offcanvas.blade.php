@@ -12,14 +12,4 @@
     <div class="offcanvas-body">
 
     </div>
-
-    <!-- Footer -->
-    <div class="offcanvas-footer border-top p-3 d-flex justify-content-right gap-2">
-        <button type="button" class="btn btn-primary" id="submit">
-            Save
-        </button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">
-            Cancel
-        </button>
-    </div>
 </div>

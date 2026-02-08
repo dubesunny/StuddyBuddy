@@ -1,0 +1,106 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\ForgotPasswordRequest;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
+use App\Models\User;
+use Exception;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
+
+class AuthController extends Controller
+{
+    public function register(){
+        $roles = Role::whereNot('name','admin')->get();
+        return view('authentication.register',compact('roles'));
+    }
+
+    public function registerAttempt(RegisterRequest $request){
+        DB::beginTransaction();
+        try{
+            $attributes = $request->validated();
+            $attributes['status'] = 'active';
+            unset($attributes['role']);
+            $user = User::create($attributes);
+            $role = Role::findById($request->role);
+            $user->assignRole($role->name);
+            event(new Registered($user));
+            $credentials = $request->only(['email','password']);
+            Auth::attempt($credentials);
+            $request->session()->regenerate();
+            DB::commit();
+            return redirect()->route('verification.notice');
+        }catch(Exception $e){
+            DB::rollBack();
+            return back()->with('error',$e->getMessage());
+        }
+    }
+
+    public function login(){
+        return view('authentication.login');
+    }
+
+    public function attempt(LoginRequest $request){
+        if(Auth::attempt($request->only('email','password'),$request->remember)){
+            if(Auth::user()->getRawOriginal('status') === 'active'){
+                return redirect()->route('dashboard')->with('success','Welcome Back!');
+            }else {
+                Auth::logout();
+                Session::flush();
+                return redirect('login')->with('error','Contact admin your account has been suspended');
+            }
+        }
+        return redirect()->back()->with('error','Invalid username or password');
+    }
+
+    public function forgotPassword(){
+        return view('authentication.forgetpassword');
+    }
+
+    public function sendPasswordResetLink(ForgotPasswordRequest $request){
+        $status = Password::sendResetLink($request->only('email'));
+
+        return $status === Password::RESET_LINK_SENT ? back()->with('success',__($status)) : back()->withErrors(['email' => __($status)]);
+    }
+
+    public function passwordReset(string $token){
+        return view('authentication.passwordReset',compact('token'));
+    }
+
+    public function resetPassword(Request $request){
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' =>  'required|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/|confirmed',
+        ]);
+
+        $status = Password::reset($request->only(['email','password','password_confirmation','token']),
+                function(User $user,string $password){
+                    $user->forceFill([
+                        'password' => $password
+                    ])->setRememberToken(Str::random(60));
+                    $user->save();
+                    event(new PasswordReset($user));
+                }
+        );
+        return $status === Password::PASSWORD_RESET
+            ? redirect()->route('login')->with('status', __($status))
+            : back()->withErrors(['email' => [__($status)]]);
+
+    }
+
+    public function logout(){
+        Session::flush();
+        Auth::logout();
+        return redirect()->route('login')->with('success','You have logged out successfully');
+    }
+}

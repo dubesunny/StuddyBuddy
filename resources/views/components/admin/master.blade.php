@@ -22,6 +22,7 @@
                 <div class="content-wrapper">
                     {{ $slot }}
                 </div>
+                <X-admin.modal/>
                 <x-admin.Offcanvas />
                 <!-- content-wrapper ends -->
                 <!-- partial:partials/_footer.html -->

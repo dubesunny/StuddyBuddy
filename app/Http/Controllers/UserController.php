@@ -7,6 +7,7 @@ use App\Http\Requests\UserRequest;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
@@ -18,10 +19,12 @@ class UserController extends BaseController
      */
     public function index(UserDataTable $dataTable)
     {
+        abort_if(!Auth::user()->can('view_user'),403);
         $this->breadcrumbs([
             'User' => route('users.index')
         ]);
-        return $dataTable->render('admin.user.index');
+        $roles = Role::all();
+        return $dataTable->render('admin.user.index',compact('roles'));
     }
 
     /**
@@ -29,8 +32,9 @@ class UserController extends BaseController
      */
     public function create()
     {
+        abort_if(!Auth::user()->can('add_user'),403);
         $roles = Role::all();
-        return view('admin.user.create',compact('roles'));
+        return view('admin.user.create', compact('roles'));
     }
 
     /**
@@ -38,23 +42,24 @@ class UserController extends BaseController
      */
     public function store(UserRequest $request)
     {
+        abort_if(!Auth::user()->can('add_user'),403);
         DB::beginTransaction();
-        try{
+        try {
             $data = $request->validated();
-            if($request->hasFile('image')){
-                $imagename = 'Image_'.User::max('id') + 1;
-                Storage::putFileAs('image',$data['image'],$imagename);
+            if ($request->hasFile('image')) {
+                $imagename = 'Image_' . User::max('id') + 1 . '.jpg';
+                Storage::putFileAs('image', $data['image'], $imagename);
                 $data['image'] = $imagename;
             }
             unset($data['role']);
-            $data['status'] = $request->status == 'yes' ? 'active' : 'inactive';
             $user = User::create($data);
-            $user->assignRole($request->role);
+            $role = Role::findById($request->role);
+            $user->assignRole($role->name);
             DB::commit();
-            return response()->json(['message' => 'User added successfully'],200);
-        }catch(Exception $e){
+            return response()->json(['message' => 'User added successfully'], 200);
+        } catch (Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => $e->getMessage()],500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -69,24 +74,61 @@ class UserController extends BaseController
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(User $user)
     {
-        //
+        abort_if(!Auth::user()->can('edit_user'),403);
+        $roles = Role::all();
+        $user = $user->load('roles');
+        return view('admin.user.edit', compact('roles', 'user'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UserRequest $request, User $user)
     {
-        //
+        abort_if(!Auth::user()->can('edit_user'),403);
+        DB::beginTransaction();
+        try {
+            $data = $request->validated();
+            if ($request->hasFile('image')) {
+                if ($user->getRawOriginal('image')) {
+                    Storage::disk('public')->delete('image/' . $user->getRawOriginal('image'));
+                }
+
+                $imagename = 'Image_' . User::max('id') + 1 . '.jpg';
+                Storage::putFileAs('image', $data['image'], $imagename);
+                $data['image'] = $imagename;
+            }
+            unset($data['role']);
+            $user->update($data);
+            $role = Role::findById($request->role);
+            $user->assignRole($role->name);
+            DB::commit();
+            return response()->json(['message' => 'User updated successfully'], 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(User $user)
     {
-        //
+        abort_if(!Auth::user()->can('delete_user'),403);
+        DB::beginTransaction();
+        try {
+            if ($user->getRawOriginal('image')) {
+                Storage::disk('public')->delete('image/' . $user->getRawOriginal('image'));
+            }
+            $user->delete();
+            DB::commit();
+            return response()->json(['message' => 'User deleted successfully'], 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
 }

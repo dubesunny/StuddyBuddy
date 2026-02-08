@@ -26287,3 +26287,8 @@ dl li {
   flex-grow: 1;
 }
 /*# sourceMappingURL=maps/style.css.map */
+
+.dataTables_length select.form-select {
+    padding-right: 2.5rem;
+    background-position: right 0.75rem center;
+}
